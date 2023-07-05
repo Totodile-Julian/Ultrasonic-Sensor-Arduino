@@ -1,44 +1,31 @@
-#include <NewPing.h>  
-#define TRIGGER_PIN  9  
-#define ECHO_PIN     10  
-#define MAX_DISTANCE 140  
-NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);  
+#include <NewPing.h>
 
-int analogVal;   
+#define TRIGGER_PIN  9
+#define ECHO_PIN     10
+#define MAX_DISTANCE 140
 
-int tempPin = A0;   
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
 
-float voltage, temp;   
+const int temperaturePin = A0;
 
-const int trigPin = 9;     
+void setup() {
+  Serial.begin(9600); // Starts the serial communication
+}
 
-const int echoPin = 10;   
+void loop() {
+  int analogValue = analogRead(temperaturePin);
+  float temperatureCelsius = map(analogValue, 0, 1023, -40, 125);
+  float temperatureKelvin = temperatureCelsius + 273.15;
 
-float duration;  
+  Serial.print("Temperature: ");
+  Serial.print(temperatureKelvin);
+  Serial.print(" K");
 
-void setup() {  
-  Serial.begin(9600); // Starts the serial communication  
-}   
+  unsigned int distance = sonar.ping_median(); // Do multiple pings (default=5), discard out-of-range pings, and return median in microseconds
 
-void loop() {  
+  Serial.print(" Distance: ");
+  Serial.print(distance);
+  Serial.println(" mm");
 
-analogVal = analogRead(tempPin);   
-
-voltage = (analogVal*5.000)/1024;   
-
-float tempC = voltage*100;  
-
-float temp = (tempC + 273);   
-
-Serial.print(temp);   
-
-delay(50);  
-
-Serial.print(" ");  
-Serial.print(millis()); // Prints the time in millisec and distance in mm on the Serial Monitor    
-Serial.print(" ");   
-
-Serial.println(sonar.ping_median()); //Do multiple pings (default=5), discard out of range pings and return median in microseconds  
-
-delay (1000);  
-} 
+  delay(1000);
+}
